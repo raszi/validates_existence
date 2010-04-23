@@ -12,8 +12,9 @@ module ActiveRecord
       # itself may be nil. A non-nil key requires that the foreign object must exist.
       # Works with polymorphic belongs_to.
       def validates_existence_of(*attr_names)
-        configuration = { :message => "does not exist", :on => :save }
+        configuration = { :message => :non_existent, :on => :save }
         configuration.update(attr_names.pop) if attr_names.last.is_a?(Hash)
+        configuration[:default_message] = "does not exist"
       
         send(validation_method(configuration[:on]), configuration) do |record|
           attr_names.each do |attr_name|
@@ -28,13 +29,13 @@ module ActiveRecord
                 if !foreign_type_value.blank?
                   assoc_class = foreign_type_value.constantize
                 else
-                  record.errors.add(attr_name, configuration[:message])
+                  record.errors.add(attr_name, configuration[:message], :default => configuration[:default_message])
                   next
                 end
               else # not polymorphic
                 assoc_class = assoc.klass
               end
-              record.errors.add(attr_name, configuration[:message]) unless assoc_class && assoc_class.exists?(fk_value)
+              record.errors.add(attr_name, configuration[:message], :default => configuration[:default_message]) unless assoc_class && assoc_class.exists?(fk_value)
             end
           end
         end
