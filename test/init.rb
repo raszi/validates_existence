@@ -15,7 +15,7 @@ end
 require 'rubygems'
 gem 'activerecord'
 require 'active_record'
-ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :dbfile => ':memory:'
+ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
 
 # Require the main init.rb for the plugin
 #
