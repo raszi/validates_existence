@@ -77,11 +77,21 @@ class ValidatesExistenceTest < Test::Unit::TestCase
       assert !@post.save
       assert @post.errors.on(:blog)
     end
+
+    def test_should_create_post_with_required_blog_when_blog_is_a_new_blog
+      @post = PostWithRequiredBlog.new :blog => Blog.new
+      assert @post.save
+    end
   
   # PostWithoutRequiredBlog
   
     def test_should_create_post_without_required_blog_with_valid_blog
       @post = PostWithoutRequiredBlog.new :blog_id => @default_blog.id
+      assert @post.save
+    end
+
+    def test_should_create_post_without_required_blog_with_a_new_blog
+      @post = PostWithoutRequiredBlog.new :blog => Blog.new
       assert @post.save
     end
   
@@ -102,6 +112,11 @@ class ValidatesExistenceTest < Test::Unit::TestCase
       @comment = CommentWithRequiredCommentable.new :commentable_id => @default_post.id, :commentable_type => 'Post'
       assert @comment.save
     end
+
+    def test_should_create_comment_with_required_commentable_with_a_new_commentable
+      @comment = CommentWithRequiredCommentable.new :commentable => Post.new
+      assert @comment.save
+    end
   
     def test_should_not_create_comment_with_required_commentable_when_commentable_is_nil
       @comment = CommentWithRequiredCommentable.new
@@ -119,6 +134,11 @@ class ValidatesExistenceTest < Test::Unit::TestCase
   
     def test_should_create_comment_without_required_commentable_with_valid_commentable
       @comment = CommentWithoutRequiredCommentable.new :commentable_id => @default_post.id, :commentable_type => 'Post'
+      assert @comment.save
+    end
+
+    def test_should_create_comment_without_required_commentable_with_a_new_commentable
+      @comment = CommentWithoutRequiredCommentable.new :commentable => Post.new
       assert @comment.save
     end
   
