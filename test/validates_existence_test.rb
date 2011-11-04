@@ -1,14 +1,11 @@
 require File.dirname(__FILE__) + '/init'
 
-
-# Blog
-
+  # Blog
   class Blog < ActiveRecord::Base
     has_many :posts
   end
 
-# Post
-
+  # Post
   class Post < ActiveRecord::Base
     belongs_to :blog
     has_many :comments, :as => :commentable
@@ -32,8 +29,7 @@ require File.dirname(__FILE__) + '/init'
     attr_accessor :condition
   end
 
-# Comment
-
+  # Comment
   class Comment < ActiveRecord::Base
     belongs_to :commentable, :polymorphic => true
   end
@@ -54,7 +50,7 @@ class ValidatesExistenceTest < Test::Unit::TestCase
     @default_blog = Blog.create
     @default_post = PostWithoutRequiredBlog.create
   end
-  
+
   def teardown
     drop_all_tables
   end
@@ -62,123 +58,131 @@ class ValidatesExistenceTest < Test::Unit::TestCase
   # PostWithRequiredBlog
   
     def test_should_create_post_with_required_blog_with_valid_blog
-      @post = PostWithRequiredBlog.new :blog_id => @default_blog.id
-      assert @post.save
+      obj = PostWithRequiredBlog.new :blog_id => @default_blog.id
+      assert obj.valid?
+
+      obj = PostWithRequiredBlog.new :blog => @default_blog
+      assert obj.valid?
     end
   
     def test_should_not_create_post_with_required_blog_when_blog_is_nil
-      @post = PostWithRequiredBlog.new
-      assert !@post.save
-      assert @post.errors.on(:blog)
+      obj = PostWithRequiredBlog.new
+      assert !obj.valid?
+      assert obj.errors.on(:blog)
+    end
+
+    def test_should_create_post_with_required_blog_when_blog_does_exist
+      obj = PostWithRequiredBlog.new :blog_id => nil, :blog => @default_blog
+      assert obj.valid?
     end
   
     def test_should_not_create_post_with_required_blog_when_blog_does_not_exist
-      @post = PostWithRequiredBlog.new :blog_id => '2'
-      assert !@post.save
-      assert @post.errors.on(:blog)
+      obj = PostWithRequiredBlog.new :blog_id => '2'
+      assert !obj.valid?
+      assert obj.errors.on(:blog)
     end
 
     def test_should_create_post_with_required_blog_when_blog_is_a_new_blog
-      @post = PostWithRequiredBlog.new :blog => Blog.new
-      assert @post.save
+      obj = PostWithRequiredBlog.new :blog => Blog.new
+      assert obj.valid?
     end
   
   # PostWithoutRequiredBlog
   
     def test_should_create_post_without_required_blog_with_valid_blog
-      @post = PostWithoutRequiredBlog.new :blog_id => @default_blog.id
-      assert @post.save
+      obj = PostWithoutRequiredBlog.new :blog_id => @default_blog.id
+      assert obj.valid?
     end
 
     def test_should_create_post_without_required_blog_with_a_new_blog
-      @post = PostWithoutRequiredBlog.new :blog => Blog.new
-      assert @post.save
+      obj = PostWithoutRequiredBlog.new :blog => Blog.new
+      assert obj.valid?
     end
   
     def test_should_create_post_without_required_blog_when_blog_is_nil
-      @post = PostWithoutRequiredBlog.new
-      assert @post.save
+      obj = PostWithoutRequiredBlog.new
+      assert obj.valid?
     end
   
     def test_should_not_create_post_without_required_blog_when_blog_does_not_exist
-      @post = PostWithoutRequiredBlog.new :blog_id => '2'
-      assert !@post.save
-      assert @post.errors.on(:blog)
+      obj = PostWithoutRequiredBlog.new :blog_id => '2'
+      assert !obj.valid?
+      assert obj.errors.on(:blog)
     end
     
   # Polymorphic CommentWithRequiredCommentable
   
     def test_should_create_comment_with_required_commentable_with_valid_commentable
-      @comment = CommentWithRequiredCommentable.new :commentable_id => @default_post.id, :commentable_type => 'Post'
-      assert @comment.save
+      obj = CommentWithRequiredCommentable.new :commentable_id => @default_post.id, :commentable_type => 'Post'
+      assert obj.valid?
     end
 
     def test_should_create_comment_with_required_commentable_with_a_new_commentable
-      @comment = CommentWithRequiredCommentable.new :commentable => Post.new
-      assert @comment.save
+      obj = CommentWithRequiredCommentable.new :commentable => Post.new
+      assert obj.valid?
     end
   
     def test_should_not_create_comment_with_required_commentable_when_commentable_is_nil
-      @comment = CommentWithRequiredCommentable.new
-      assert !@comment.save
-      assert @comment.errors.on(:commentable)
+      obj = CommentWithRequiredCommentable.new
+      assert !obj.valid?
+      assert obj.errors.on(:commentable)
     end
   
     def test_should_not_create_comment_with_required_commentable_when_commentable_does_not_exist
-      @comment = CommentWithRequiredCommentable.new :commentable_id => '2', :commentable_type => 'Post'
-      assert !@comment.save
-      assert @comment.errors.on(:commentable)
+      obj = CommentWithRequiredCommentable.new :commentable_id => '2', :commentable_type => 'Post'
+      assert !obj.valid?
+      assert obj.errors.on(:commentable)
     end
     
   # Polymorphic CommentWithoutRequiredCommentable
   
     def test_should_create_comment_without_required_commentable_with_valid_commentable
-      @comment = CommentWithoutRequiredCommentable.new :commentable_id => @default_post.id, :commentable_type => 'Post'
-      assert @comment.save
+      obj = CommentWithoutRequiredCommentable.new :commentable_id => @default_post.id, :commentable_type => 'Post'
+      assert obj.valid?
     end
 
     def test_should_create_comment_without_required_commentable_with_a_new_commentable
-      @comment = CommentWithoutRequiredCommentable.new :commentable => Post.new
-      assert @comment.save
+      obj = CommentWithoutRequiredCommentable.new :commentable => Post.new
+      assert obj.valid?
     end
   
     def test_should_create_comment_without_required_commentable_when_commentable_is_nil
-      @comment = CommentWithoutRequiredCommentable.new
-      assert @comment.save
+      obj = CommentWithoutRequiredCommentable.new
+      assert obj.valid?
     end
   
     def test_should_not_create_comment_without_required_commentable_when_commentable_does_not_exist
-      @comment = CommentWithoutRequiredCommentable.new :commentable_id => '2', :commentable_type => 'Post'
-      assert !@comment.save
-      assert @comment.errors.on(:commentable)
+      obj = CommentWithoutRequiredCommentable.new :commentable_id => '2', :commentable_type => 'Post'
+      assert !obj.valid?
+      assert obj.errors.on(:commentable)
     end
     
   # PostWithRequiredBlogIf (:if => :condition)
   
     def test_post_should_require_blog_when_if_condition_is_true
-      @post = PostWithRequiredBlogIf.new
-      @post.condition = true
-      assert !@post.save
+      obj = PostWithRequiredBlogIf.new
+      obj.condition = true
+      assert !obj.valid?
     end
     
     def test_post_should_not_require_blog_when_if_condition_is_false
-      @post = PostWithRequiredBlogIf.new
-      @post.condition = false
-      assert @post.save
+      obj = PostWithRequiredBlogIf.new
+      obj.condition = false
+      assert obj.valid?
     end
     
   # PostWithRequiredBlogUnless (:unless => :condition)
 
     def test_post_should_require_blog_when_unless_condition_is_false
-      @post = PostWithRequiredBlogUnless.new
-      @post.condition = false
-      assert !@post.save
+      obj = PostWithRequiredBlogUnless.new
+      obj.condition = false
+      assert !obj.valid?
     end
     
     def test_post_should_not_require_blog_when_unless_condition_is_true
-      @post = PostWithRequiredBlogUnless.new
-      @post.condition = true
-      assert @post.save
+      obj = PostWithRequiredBlogUnless.new
+      obj.condition = true
+      assert obj.valid?
     end
   
 end
